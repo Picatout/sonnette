@@ -1,0 +1,100 @@
+ASxxxx Linker V03.00 + NoICE + sdld,  page 1.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     FFFFFFFF  s_SSEG                          
+     00000000  .__.ABS.                           HW_INIT
+     00000000  l_DATA                          
+     00000000  l_SSEG                          
+     00000000  l__CODE                         
+     00000000  s_DATA1                         
+     00000000  s_DATA2                         
+     00000000  s_SSEG0                         
+     00000000  s__CODE                         
+     00000001  s_DATA                          
+     0000001D  l_DATA1                         
+     00000080  l_HOME                          
+     00000080  l_SSEG0                         
+     00000081  l_DATA2                         
+     0000088D  l_CODE                          
+     00008000  s_HOME                          
+     00008080  s_CODE                          
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+SSEG0                               00000000    00000080 =         128. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     0000057F  stack_full                         HW_INIT
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+HOME                                00008000    00000080 =         128. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+DATA1                               00000000    0000001D =          29. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000002  timer                              HW_INIT
+     00000008  acc32                              HW_INIT
+     00000009  acc24                              HW_INIT
+     0000000A  acc16                              HW_INIT
+     0000000B  acc8                               HW_INIT
+     0000000C  ptr16                              HW_INIT
+     0000000E  flags                              HW_INIT
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+DATA2                               00000000    00000081 =         129. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 6.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CODE                                00008080    0000088D =        2189. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00008279  oled_init                          HW_INIT
+     00008872  move                               HW_INIT
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 7.
+
+Files Linked                              [ module(s) ]
+
+build/oled_test.rel                       [ HW_INIT ]
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 8.
+
+User Base Address Definitions
+
+HOME = 0x8000
+DATA = 0x0001
+SSEG = 0xffffffff
+
+
