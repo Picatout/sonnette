@@ -134,10 +134,10 @@ line_window:
 line_clear:
     call line_window 
     call clear_disp_buffer
-    ldw x,#DISPLAY_BUFFER_SIZE 
+    ld a,#DISPLAY_BUFFER_SIZE 
     call oled_data
     btjf disp_flags,#F_BIG,9$
-    ldw x,#DISPLAY_BUFFER_SIZE
+    ld  a,#DISPLAY_BUFFER_SIZE
     call oled_data 
 9$: ret 
 
@@ -147,16 +147,16 @@ line_clear:
 ;   none 
 ;----------------------
 clear_disp_buffer:
-    pushw x 
     push a 
+    pushw x 
     ldw x,#disp_buffer 
     ld a,#DISPLAY_BUFFER_SIZE
 1$: clr(x)
     incw x 
     dec a 
     jrne 1$
-    pop a 
     popw x 
+    pop a 
     ret 
 
 ;--------------------------
@@ -164,11 +164,10 @@ clear_disp_buffer:
 ;--------------------------
 display_clear:
     push a 
-    pushw x 
     call all_display 
     call clear_disp_buffer
     push #8
-1$: ldw x,#DISPLAY_BUFFER_SIZE
+1$: ld a,#DISPLAY_BUFFER_SIZE
     call oled_data
     dec (1,sp)
     jrne 1$ 
@@ -176,7 +175,6 @@ display_clear:
     _clrz line 
     _clrz col
     bres disp_flags,#F_SCROLL  
-    popw x
     pop a 
     ret 
 
@@ -275,7 +273,6 @@ put_char:
     call cmove 
 3$: clrw x 
     _ldaz to_send  
-    ld xl,a 
     call oled_data 
     call cursor_right 
     popw y
@@ -524,7 +521,7 @@ put_mega_char:
     jrne 4$ 
     dec (BYTE_CNT,sp)
     jrne 1$
-    ldw x,#MEGA_FONT_SIZE
+    ld a,#MEGA_FONT_SIZE
     call oled_data 
     ldw y,(YSAVE,sp)
     _drop VAR_SIZE 

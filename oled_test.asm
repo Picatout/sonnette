@@ -25,6 +25,7 @@ SEPARATE=0
     .area CODE 
 .endif 
 	
+.if 0
 ;---------------------------------------
 ; move memory block 
 ; input:
@@ -75,6 +76,7 @@ move_exit:
 	_drop VSIZE
 	pop a 
 	ret 	
+.endif 
 
 ;--------------------
 ; input:
@@ -96,6 +98,7 @@ beep:
 ;   X     milliseconds 
 ;-------------------------
 pause:
+	bres flags,#FTIMER 
 	_strxz timer 
 	bset flags,#FTIMER 
 	btjt flags,#FTIMER,. 
@@ -103,21 +106,26 @@ pause:
 
 
 main:
-	_led_on 
-	ldw x,#200
-	call beep 
+	ldw x,#200 
+	call beep
     call oled_init 
-jra .
-    call display_clear 
     ld a,#SMALL  
     call select_font 
+;    call display_clear 
+jp blink_led 
+1$: 
     ldw y,#hello
     call put_string 
-	_led_off
-	jra . 
+	ld a,#10 
+	call pause 
+	jra 1$ 
 
-hello: .asciz "HELLO WORLD!"
+hello: .asciz "HELLO WORLD!\n"
 
 
 
-
+blink_led:
+	_Led_toggle 
+	ldw x,#100
+	call pause 
+	jra blink_led  

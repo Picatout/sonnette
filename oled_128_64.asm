@@ -36,7 +36,7 @@
     ; before using it 
     .macro _set_cmd n
     BUF_OFS=BUF_OFS+1 
-    mov cmd_buffer_BUF_OFS,#0x80
+    mov cmd_buffer+BUF_OFS,#0x80
     BUF_OFS=BUF_OFS+1 
     mov cmd_buffer+BUF_OFS,#n 
     .endm 
@@ -174,15 +174,13 @@ charge_pump_switch:
 ;---------------------------------
 oled_cmd:
     pushw x 
-    _clrz i2c_count 
-    mov i2c_count+1,#2
+    mov i2c_count,#2
     ldw x,#co_code 
     ld (1,x),a 
     ld a,#OLED_CMD 
     ld (x),a   
     _strxz i2c_buf 
     mov i2c_devid,#OLED_DEVID 
-    _clrz i2c_status
     call i2c_write
     popw x 
     ret 
@@ -190,18 +188,19 @@ oled_cmd:
 ;---------------------------------
 ; send data to OLED GDDRAM
 ; parameters:
-;     X     byte count  
+;     A     byte count  
 ;---------------------------------
 oled_data:
-    incw x   
-    _strxz i2c_count     
+    pushw x 
+    inc a 
+    _straz i2c_count
     ldw x,#co_code 
     ld a,#OLED_DATA 
     ld (x),a 
     _strxz i2c_buf
     mov i2c_devid,#OLED_DEVID 
-    _clrz i2c_status
     call i2c_write
+    popw x 
     ret 
 
 

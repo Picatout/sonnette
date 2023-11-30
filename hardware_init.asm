@@ -39,7 +39,7 @@ STACK_EMPTY=RAM_SIZE-1
 ;;-----------------------------------
     .org RAM_END - STACK_SIZE 
 stack_full:: .ds STACK_SIZE   ; control stack 
-stack_unf: ; stack underflow ; control_stack bottom 
+stack_unf:: ; stack underflow ; control_stack bottom 
 
 ;;--------------------------------------
     .area HOME 
@@ -79,43 +79,46 @@ stack_unf: ; stack underflow ; control_stack bottom
 
 ;--------------------------------------
     .area DATA (ABS)
-	.org 0  
+	.org 1 
 ;--------------------------------------	
 ; keep the following 3 variables in this order 
-ticks: .blkb 2 ; milliseconds ticks counter (see Timer4UpdateHandler)
+ticks:: .blkw 1 ; milliseconds ticks counter (see Timer4UpdateHandler)
 timer:: .blkw 1 ;  milliseconds count down timer 
-seedx: .blkw 1  ; xorshift 16 seed x  used by RND() function 
-seedy: .blkw 1  ; xorshift 16 seed y  used by RND() funcion
+.if WANT_PRNG
+seedx:: .blkw 1  ; xorshift 16 seed x  used by RND() function 
+seedy:: .blkw 1  ; xorshift 16 seed y  used by RND() funcion
+.endif 
 acc32:: .blkb 1 ; 32 bit accumalator upper-byte 
 acc24:: .blkb 1 ; 24 bits accumulator upper-byte 
 acc16:: .blkb 1 ; 16 bits accumulator, acc24 high-byte
 acc8::  .blkb 1 ;  8 bits accumulator, acc24 low-byte  
 ptr16::  .blkb 1 ; 16 bits pointer , farptr high-byte 
-ptr8:   .blkb 1 ; 8 bits pointer, farptr low-byte  
+ptr8::   .blkb 1 ; 8 bits pointer, farptr low-byte  
 flags:: .blkb 1 ; various boolean flags
 ; I2C peripheral 
-i2c_buf: .blkw 1 ; i2c buffer address 
-i2c_count: .blkb 1 ; bytes to transmit 
-i2c_idx: .blkb 1 ; index in buffer
-i2c_status: .blkb 1 ; error status 
-i2c_devid: .blkb 1 ; device identifier  
+i2c_buf:: .blkw 1 ; i2c buffer address 
+i2c_count:: .blkb 1 ; bytes to transmit 
+i2c_idx:: .blkb 1 ; index in buffer
+i2c_status:: .blkb 1 ; error status 
+i2c_devid:: .blkb 1 ; device identifier  
 ;; OLED display 
-line: .blkb 1 ; text line cursor position 
-col: .blkb 1 ;  text column cursor position
-cpl: .blkb 1 ; characters per line 
-disp_lines: .blkb 1 ; text lines per display  
-font_width: .blkb 1 ; character width in pixels 
-font_height: .blkb 1 ; character height in pixels 
-to_send: .blkb 1 ; bytes to send per character 
-disp_flags: .blkb 1 ; boolean flags 
+line:: .blkb 1 ; text line cursor position 
+col:: .blkb 1 ;  text column cursor position
+cpl:: .blkb 1 ; characters per line 
+disp_lines:: .blkb 1 ; text lines per display  
+font_width:: .blkb 1 ; character width in pixels 
+font_height:: .blkb 1 ; character height in pixels 
+to_send:: .blkb 1 ; bytes to send per character 
+disp_flags:: .blkb 1 ; boolean flags 
 
+;	.area BUFFER (ABS)
 	.org 0x100
-co_code: .blkb 1	
-disp_buffer: .ds DISPLAY_BUFFER_SIZE ; oled display page buffer 
+co_code:: .blkb 1	
+disp_buffer:: .ds DISPLAY_BUFFER_SIZE ; oled display page buffer 
 
-free_ram: ; from here RAM free for BASIC text 
+free_ram:: ; from here RAM free for BASIC text 
 
-	.area CODE 
+	.area CODE
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; non handled interrupt 
@@ -132,6 +135,9 @@ NonHandledInterrupt:
 ; timer range {0..65535}
 ;--------------------------------
 Timer4UpdateHandler:
+	btjt SWI_BTN_PORT+GPIO_IDR,#SWI_BTN_BIT,0$
+	call swim_probe
+0$:
 	clr TIM4_SR1 
 	_ldxz ticks
 	addw x,#1 
@@ -187,40 +193,36 @@ cold_start:
 0$: clr (x)
 	decw x 
 	jrne 0$
-call swim_probe
-; set pull up on
-; pin 2 -> PA2 
-	bset PA_CR1,#2
-; pin 5 -> PD0 
-	bset PD_CR1,#0 
-; pin 6 -> PB6 
-	bset PB_CR1,#6 
-; if PA2 == 0 then loop until released 
-; in case PA0 is used as GPIO by program 
-; which forbid SWIM. 
-	btjf PA_IDR,#2,. 
+; init Fsys clock to 16Mhz HSI 
+    call clock_init 
 ; set user LED pin as output 
     bset LED_PORT+GPIO_DDR,#LED_BIT ; output
     bset LED_PORT+GPIO_CR1,#LED_BIT ; push pull 
 	bres LED_PORT+GPIO_ODR,#LED_BIT ; turn off user LED  
-    call clock_init 
-	call timer4_init ; msec ticks timer 
+; loop if SWI_BTN low 
+	call swim_probe
+; init TIMER4 to interrupt at every millisecond
+	call timer4_init
+; initialize I2C peripheral to 400Khz  
 	ld a,#I2C_FAST 
-	call i2c_init 
-	rim ; enable interrupts 
+	call i2c_init 	
+; enable interrupts	
+	rim  
+.if WANT_PRNG 
 ; RND function seed 
 ; must be initialized 
 ; to value other than 0.
 ; take values from ROM space 
-	ldw x,#I2cIntHandler
+	ldw x,#0x6000
 	ldw seedy,x  
-	ldw x,#main 
-	ldw seedx,x  
+	ldw x,#0x6002
+	ldw seedx,x 
+.endif  
     jp main 	
 
 
 ;---------------------
-; probe PB6 
+; probe SWI_BTN  
 ; if 0 then loop  
 ; until released 
 ; needed for SWIM 
@@ -228,12 +230,18 @@ call swim_probe
 ; as output 
 ;---------------------
 swim_probe:
-	push PB_CR1
-	push PB_DDR
-	bres PB_DDR,#6 
-	bset PB_CR1,#6 ; pull up 
-	btjf PB_IDR,#6,.
-	pop PB_DDR 
-	pop PB_CR1
+; save original configuration 
+; set as input with pull up 
+	push SWI_BTN_PORT+GPIO_CR1
+	bset SWI_BTN_PORT+GPIO_CR1,#SWI_BTN_BIT ; pull up 
+	push SWI_BTN_PORT+GPIO_DDR
+	bres SWI_BTN_PORT+GPIO_DDR,#SWI_BTN_BIT 
+; infinite loop if input==0 
+	_led_on 
+	btjf SWI_BTN_PORT+GPIO_IDR,#SWI_BTN_BIT,.
+	_led_off 
+;restore initial configuration 
+	pop SWI_BTN_PORT+GPIO_DDR 
+	pop SWI_BTN_PORT+GPIO_CR1
 	ret 
 

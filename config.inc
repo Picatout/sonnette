@@ -10,8 +10,16 @@
 	MINOR=0
 	REV=0
 
+
+; if want pseudo random number generator set to 1
+WANT_PRNG=0
+
 ; master clock frequency in Mhz 
 	FMSTR=16 
+
+; SWI button 
+	SWI_BTN_PORT=PB 
+	SWI_BTN_BIT=6 
 
 ; LED ON pin 5 
 ; LED port 
