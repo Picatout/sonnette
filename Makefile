@@ -1,7 +1,12 @@
 #############################
-# TinyBasic make file
+# stm8s001j3m experiment
 #############################
-NAME=oled_test
+MCU=stm8l001j3
+PROGRAMMER=stlinkv2
+FLASH_SIZE=8192
+BUILD_DIR=build/
+MCU_INC=inc/stm8l001j3.inc
+NAME=doorbell
 AS=sdasstm8
 CC=sdcc
 SDAR=sdar
@@ -9,8 +14,8 @@ LINK=sdld
 OBJCPY=objcpy 
 CFLAGS=-mstm8 -lstm8 -L$(LIB_PATH) -I../inc
 INC=inc/
-INCLUDES=$(MCU_INC) $(INC)gen_macros.inc $(INC)app_macros.inc $(INC)/ssd1306.inc config.inc 
-SRC=hardware_init.asm i2c.asm oled_128_64.asm oled-font.asm display.asm xor_prng.asm $(NAME).asm
+INCLUDES=$(MCU_INC) $(INC)gen_macros.inc $(INC)app_macros.inc
+SRC=$(NAME).asm
 OBJECT=$(BUILD_DIR)$(NAME).rel
 OBJECTS=$(BUILD_DIR)$(SRC:.asm=.rel)
 LIST=$(BUILD_DIR)$(NAME).lst
@@ -40,20 +45,18 @@ clean:
 	# "***************"
 	-rm -f $(BUILD_DIR)*
 
-separate: clean $(SRC)
-	$(AS) -g -l -o $(BUILD_DIR)hardware_init.rel hardware_init.asm  
-	$(AS) -g -l -o $(BUILD_DIR)$(NAME).rel $(NAME).asm  
-	$(AS) -g -l -o $(BUILD_DIR)i2c.rel i2c.asm  
-
 flash: $(LIB)
 	#
 	# "******************"
 	# "flashing $(MCU) "
 	# "******************"
-	$(FLASH) -c $(PROGRAMMER) -p $(MCU) -s flash -w $(BUILD_DIR)$(NAME).ihx 
+	$(FLASH) -c $(PROGRAMMER) -p $(MCU) -s flash -w $(BUILD_DIR)$(NAME).bin  
 
 # read flash memory 
 read: 
-	$(FLASH) -c $(PROGRAMMER) -p $(MCU) -s flash -b 16384 -r flash.dat 
+	$(FLASH) -c $(PROGRAMMER) -p $(MCU) -s flash -b 8192 -r flash.dat 
 
- 
+# erase flash memory
+erase:
+	$(FLASH) -c $(PROGRAMMER) -p $(MCU) -s flash -w zero.bin 
+
