@@ -1758,6 +1758,12 @@
 		)
 	)
 	(junction
+		(at 195.58 128.27)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "721eaa31-38a9-4bea-ad88-e7de45152e53")
+	)
+	(junction
 		(at 194.31 152.4)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1809,7 +1815,7 @@
 	)
 	(wire
 		(pts
-			(xy 180.34 128.27) (xy 208.28 128.27)
+			(xy 180.34 128.27) (xy 195.58 128.27)
 		)
 		(stroke
 			(width 0)
@@ -1896,6 +1902,16 @@
 			(type default)
 		)
 		(uuid "70602762-b617-43d0-9eee-ddc05473eeb0")
+	)
+	(wire
+		(pts
+			(xy 195.58 135.89) (xy 195.58 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "74cb9ae0-88bb-47f4-a142-d03b6ff28d72")
 	)
 	(wire
 		(pts
@@ -2016,6 +2032,16 @@
 			(type default)
 		)
 		(uuid "f0b1313e-7bb1-4328-9fb9-6997a4f25b56")
+	)
+	(wire
+		(pts
+			(xy 195.58 128.27) (xy 208.28 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f4b75689-4185-4e29-96bd-ff672619ad40")
 	)
 	(wire
 		(pts
@@ -3095,6 +3121,75 @@
 			(project ""
 				(path "/446a5a63-b234-4c89-aadd-313415f72588"
 					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 195.58 132.08 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c972013f-f100-4a11-8f5b-720906669776")
+		(property "Reference" "R3"
+			(at 197.104 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 196.85 133.604 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 193.802 132.08 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 195.58 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 195.58 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c6c08bac-a9bf-4a4c-9fd5-63372932d7e7")
+		)
+		(pin "2"
+			(uuid "202d8d2a-bfa8-4c3b-9ebf-6eab45596c84")
+		)
+		(instances
+			(project "doorbell"
+				(path "/446a5a63-b234-4c89-aadd-313415f72588"
+					(reference "R3")
 					(unit 1)
 				)
 			)

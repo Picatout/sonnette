@@ -996,7 +996,7 @@ Hexadecimal [24-Bits]
                                      38 ;; interrupt vector table at 0x8000
                                      39 ;;--------------------------------------
                                      40 
-      000000 82 00 00 D0             41     int reset   			; RESET vector 
+      000000 82 00 00 D7             41     int reset   			; RESET vector 
       000004 82 00 00 00             42 	int NonHandledInterrupt ; TRAP instruction 
       000008 00 00 00 00             43 	.word 0,0               ; not used  
       00000C 82 00 00 00             44 	int NonHandledInterrupt ; int1 FLASH   
@@ -1177,137 +1177,116 @@ Hexadecimal [24-Bits]
                            000004   196 	VSIZE=4 
                            1E8480   197 FR_TIM3=FMSTR 
       000062                        198 tone:: 
-                           000000   199 .if 0
-                                    200 	_vars VSIZE 
-                                    201 	ldw (DLY_MS,sp),x   
-                                    202 	ldw (DIVR,sp),y  ; divisor  
-                                    203 ; FR_TIM3/frequency 
-                                    204 	ldw y,#FR_TIM3>>16
-                                    205     ldw x,#FR_TIM3 
-                                    206     ld a,#17
-                                    207 1$: subw y,(DIVR,sp)
-                                    208     ccf 
-                                    209     jrc 2$
-                                    210     addw y,(DIVR,sp)
-                                    211     rcf 
-                                    212 2$:     
-                                    213     rlcw x 
-                                    214     rlcw y 
-                                    215     dec a 
-                                    216     jrne 1$
-                                    217 .endif 
-      000062 90 9E            [ 1]  218 	ld a,yh 
-      000064 C7 52 8E         [ 1]  219 	ld TIM3_ARRH,a 
-      000067 90 9F            [ 1]  220 	ld a,yl 
-      000069 C7 52 8F         [ 1]  221 	ld TIM3_ARRL,a 
-                                    222 ; 50% duty cycle 
-      00006C 90 54            [ 2]  223 	srlw y  
-      00006E 90 9E            [ 1]  224 	ld a,yh 
-      000070 C7 52 92         [ 1]  225 	ld TIM3_CCR2H,a 
-      000073 90 9F            [ 1]  226 	ld a,yl
-      000075 C7 52 93         [ 1]  227 	ld TIM3_CCR2L,a
-      000078 72 18 52 8A      [ 1]  228 	bset TIM3_CCER1,#TIM_CCER1_CC2E
-      00007C 72 10 52 80      [ 1]  229 	bset TIM3_CR1,#TIM_CR1_CEN
-      000080 72 10 52 87      [ 1]  230 	bset TIM3_EGR,#TIM_EGR_UG 	
-                                    231 ;	ldw x,(DLY_MS,sp)
-      000084                        232 	_tone_on
-      000084 72 10 52 80      [ 1]    1     bset TIM3_CR1,#TIM_CR1_CEN 
-      000088 CD 00 56         [ 4]  233 	call delay_msec    
-      00008B                        234 tone_off: 
-      00008B                        235 	_tone_off 
-      00008B 72 11 52 80      [ 1]    1 	bres TIM3_CR1,#TIM_CR1_CEN 
+      000062                        199 	_led_on 
+      000062 72 1F 50 05      [ 1]    1     bres LED_PORT,#LED_BIT 
+      000066 90 9E            [ 1]  200 	ld a,yh 
+      000068 C7 52 8E         [ 1]  201 	ld TIM3_ARRH,a 
+      00006B 90 9F            [ 1]  202 	ld a,yl 
+      00006D C7 52 8F         [ 1]  203 	ld TIM3_ARRL,a 
+                                    204 ; 25% duty cycle 
+      000070 90 54            [ 2]  205 	srlw y  
+      000072 90 9E            [ 1]  206 	ld a,yh 
+      000074 C7 52 92         [ 1]  207 	ld TIM3_CCR2H,a 
+      000077 90 9F            [ 1]  208 	ld a,yl
+      000079 C7 52 93         [ 1]  209 	ld TIM3_CCR2L,a
+      00007C 72 18 52 8A      [ 1]  210 	bset TIM3_CCER1,#TIM_CCER1_CC2E
+      000080 72 10 52 80      [ 1]  211 	bset TIM3_CR1,#TIM_CR1_CEN
+      000084 72 10 52 87      [ 1]  212 	bset TIM3_EGR,#TIM_EGR_UG 	
+                                    213 ;	ldw x,(DLY_MS,sp)
+      000088                        214 	_led_on 
+      000088 72 1F 50 05      [ 1]    1     bres LED_PORT,#LED_BIT 
+      00008C                        215 	_tone_on
+      00008C 72 10 52 80      [ 1]    1     bset TIM3_CR1,#TIM_CR1_CEN 
+      000090 1D 00 3C         [ 2]  216 	subw x,#60 
+      000093 CD 00 56         [ 4]  217 	call delay_msec
+      000096                        218 	_led_off 
+      000096 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
+      00009A AE 00 3C         [ 2]  219 	ldw x,#60
+      00009D                        220 tone_off: 
+      00009D                        221 	_tone_off 
+      00009D 72 11 52 80      [ 1]    1 	bres TIM3_CR1,#TIM_CR1_CEN 
+      0000A1 CD 00 56         [ 4]  222 	call delay_msec
+      0000A4 81               [ 4]  223 	ret 
+                                    224 
+      0000A5                        225 score: ; frenquency (ARR value), duration (msec) 
+      0000A5 09 F7 01 2C            226 	.word 2551,300 ; sol4 
+      0000A9 08 E1 01 2C            227 	.word 2273,300 ; la4 
+      0000AD 0B 2F 01 2C            228 	.word 2863,300 ; fa4 
+      0000B1 16 5F 01 2C            229 	.word 5727,300 ; fa3 
+      0000B5 0E EE 01 2C            230 	.word 3822,300 ; do4 
+      0000B9 00 00 00 00            231 	.word 0,0 ; end marker 
+                                    232 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 24.
 Hexadecimal [24-Bits]
 
 
 
-                                    236  ;    _drop VSIZE 
-      00008F 81               [ 4]  237 	ret 
-                                    238 
-      000090                        239 score: ; frenquency (ARR value), duration (msec) 
-      000090 09 F7 00 FA            240 	.word 2551,250 ; sol4 
-      000094 08 E1 00 FA            241 	.word 2273,250 ; la4 
-      000098 0B 2F 00 FA            242 	.word 2863,250 ; fa4 
-      00009C 16 5F 00 FA            243 	.word 5727,250 ; fa3 
-      0000A0 0E EE 00 FA            244 	.word 3822,250 ; do4 
-      0000A4 00 00 00 00            245 	.word 0,0 ; end marker 
-                                    246 
-                                    247 ;-----------------------------
-                                    248 ; doorbell play a short tune 
-                                    249 ;-----------------------------
-                                    250 
-      0000A8                        251 play_tune:
-      0000A8                        252 	_led_on 
-      0000A8 72 1F 50 05      [ 1]    1     bres LED_PORT,#LED_BIT 
-      0000AC AE 00 90         [ 2]  253 	ldw x,#score 
-      0000AF                        254 	_strxz ptr 
-      0000AF BF 06                    1     .byte 0xbf,ptr 
-      0000B1                        255 1$:
-      0000B1 91 CE 06         [ 5]  256 	ldw y,[ptr]
-      0000B4 27 15            [ 1]  257 	jreq 3$
-      0000B6                        258 	_ldxz ptr 
-      0000B6 BE 06                    1     .byte 0xbe,ptr 
-      0000B8 1C 00 04         [ 2]  259 	addw x,#4
-      0000BB                        260 	_strxz ptr 
-      0000BB BF 06                    1     .byte 0xbf,ptr 
-      0000BD 5A               [ 2]  261 	decw x 
-      0000BE 5A               [ 2]  262 	decw x 
-      0000BF FE               [ 2]  263 	ldw x,(x)
-      0000C0 CD 00 62         [ 4]  264 	call tone
-      0000C3 AE 00 41         [ 2]  265 	ldw x,#65
-      0000C6 CD 00 56         [ 4]  266 	call delay_msec
-      0000C9 20 E6            [ 2]  267 	jra 1$ 
-      0000CB                        268 3$: 
-                                    269 ; end test code 
-      0000CB                        270 	_led_off
-      0000CB 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
-      0000CF 81               [ 4]  271 	ret 
-                                    272 
-                                    273 	
-                                    274 ;-------------------------------------
-                                    275 ;  initialization entry point 
-                                    276 ;-------------------------------------
-      0000D0                        277 reset:
-                                    278 ;set stack 
-      0000D0 AE 05 FF         [ 2]  279 	ldw x,#STACK_EMPTY
-      0000D3 94               [ 1]  280 	ldw sp,x
-                                    281 ; clear all ram 
-      0000D4 7F               [ 1]  282 0$: clr (x)
-      0000D5 5A               [ 2]  283 	decw x 
-      0000D6 26 FC            [ 1]  284 	jrne 0$
-                                    285 ; set user BELL sound pin as output 
+                                    233 ;-----------------------------
+                                    234 ; doorbell play a short tune 
+                                    235 ;-----------------------------
+                                    236 
+      0000BD                        237 play_tune:
+      0000BD AE 00 A5         [ 2]  238 	ldw x,#score 
+      0000C0                        239 	_strxz ptr 
+      0000C0 BF 06                    1     .byte 0xbf,ptr 
+      0000C2                        240 1$:
+      0000C2 91 CE 06         [ 5]  241 	ldw y,[ptr]
+      0000C5 27 0F            [ 1]  242 	jreq 3$
+      0000C7                        243 	_ldxz ptr 
+      0000C7 BE 06                    1     .byte 0xbe,ptr 
+      0000C9 1C 00 04         [ 2]  244 	addw x,#4
+      0000CC                        245 	_strxz ptr 
+      0000CC BF 06                    1     .byte 0xbf,ptr 
+      0000CE 5A               [ 2]  246 	decw x 
+      0000CF 5A               [ 2]  247 	decw x 
+      0000D0 FE               [ 2]  248 	ldw x,(x)
+      0000D1 CD 00 62         [ 4]  249 	call tone
+      0000D4 20 EC            [ 2]  250 	jra 1$ 
+      0000D6                        251 3$: 
+                                    252 ; end test code 
+      0000D6 81               [ 4]  253 	ret 
+                                    254 
+                                    255 	
+                                    256 ;-------------------------------------
+                                    257 ;  initialization entry point 
+                                    258 ;-------------------------------------
+      0000D7                        259 reset:
+                                    260 ;set stack 
+      0000D7 AE 05 FF         [ 2]  261 	ldw x,#STACK_EMPTY
+      0000DA 94               [ 1]  262 	ldw sp,x
+                                    263 ; clear all ram 
+      0000DB 7F               [ 1]  264 0$: clr (x)
+      0000DC 5A               [ 2]  265 	decw x 
+      0000DD 26 FC            [ 1]  266 	jrne 0$
+                                    267 ; set user BELL sound pin as output 
+      0000DF 72 10 50 11      [ 1]  268     bset BELL_PORT+GPIO_DDR,#BELL_BIT ; output
+      0000E3 72 10 50 12      [ 1]  269     bset BELL_PORT+GPIO_CR1,#BELL_BIT ; push pull 
+                                    270 ; set LED port as output open drain 
+      0000E7 72 1E 50 07      [ 1]  271 	bset LED_PORT+GPIO_DDR,#LED_BIT
+      0000EB                        272 	_led_off 
+      0000EB 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
+                                    273 ; init TIMER4 to interrupt at every millisecond
+      0000EF CD 00 27         [ 4]  274 	call timer4_init
+                                    275 ; init TIMER3, for sound generation 
+      0000F2 CD 00 40         [ 4]  276 	call timer3_init
+                                    277 ; configure EXTI on button 
+      0000F5 CD 00 51         [ 4]  278 	call config_exti
+                                    279 ; enable interrupts	
+      0000F8 9A               [ 1]  280 	rim
+      0000F9 90 AE 07 D0      [ 2]  281 	ldw y,#2000
+      0000FD AE 00 96         [ 2]  282 	ldw x,#150
+      000100 CD 00 62         [ 4]  283 	call tone 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 25.
 Hexadecimal [24-Bits]
 
 
 
-      0000D8 72 10 50 11      [ 1]  286     bset BELL_PORT+GPIO_DDR,#BELL_BIT ; output
-      0000DC 72 10 50 12      [ 1]  287     bset BELL_PORT+GPIO_CR1,#BELL_BIT ; push pull 
-                                    288 ; set LED port as output open drain 
-      0000E0 72 1E 50 07      [ 1]  289 	bset LED_PORT+GPIO_DDR,#LED_BIT
-      0000E4                        290 	_led_off 
-      0000E4 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
-                                    291 ; init TIMER4 to interrupt at every millisecond
-      0000E8 CD 00 27         [ 4]  292 	call timer4_init
-                                    293 ; init TIMER3, for sound generation 
-      0000EB CD 00 40         [ 4]  294 	call timer3_init
-                                    295 ; configure EXTI on button 
-      0000EE CD 00 51         [ 4]  296 	call config_exti
-                                    297 ; enable interrupts	
-      0000F1 9A               [ 1]  298 	rim
-      0000F2                        299 	_led_on 
-      0000F2 72 1F 50 05      [ 1]    1     bres LED_PORT,#LED_BIT 
-      0000F6 90 AE 03 E8      [ 2]  300 	ldw y,#1000
-      0000FA AE 00 96         [ 2]  301 	ldw x,#150
-      0000FD CD 00 62         [ 4]  302 	call tone 
-      000100                        303 	_led_off    
-      000100 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
-      000104                        304 1$:
-      000104                        305 	_enable_button
-      000104 72 12 50 0E      [ 1]    1     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
-      000108 8E               [10]  306     halt  	
-      000109 CD 00 A8         [ 4]  307 	call play_tune 
-      00010C 20 F6            [ 2]  308 	jra 1$ 
+      000103                        284 1$:
+      000103                        285 	_enable_button
+      000103 72 12 50 0E      [ 1]    1     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
+      000107 8E               [10]  286     halt  	
+      000108 CD 00 BD         [ 4]  287 	call play_tune 
+      00010B 20 F6            [ 2]  288 	jra 1$ 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 26.
 Hexadecimal [24-Bits]
 
@@ -1493,11 +1472,11 @@ Hexadecimal [24-Bits]
 
 Symbol Table
 
-  6 free_ram   000100 GR  |   7 play_tun   0000A8 R   |   5 ptr        000006 GR
-  7 reset      0000D0 R   |   7 score      000090 R   |   2 stack_fu   00057F GR
+  6 free_ram   000100 GR  |   7 play_tun   0000BD R   |   5 ptr        000006 GR
+  7 reset      0000D7 R   |   7 score      0000A5 R   |   2 stack_fu   00057F GR
   2 stack_un   0005FF GR  |   5 ticks      000001 GR  |   5 timer      000003 GR
   7 timer3_i   000040 R   |   7 timer4_i   000027 R   |   7 tone       000062 GR
-  7 tone_off   00008B R
+  7 tone_off   00009D R
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 30.
 Hexadecimal [24-Bits]
@@ -1511,5 +1490,5 @@ Area Table
    4 DATA       size      0   flags    8
    5 DATA1      size      7   flags    8
    6 DATA2      size      0   flags    8
-   7 CODE       size    10E   flags    0
+   7 CODE       size    10D   flags    0
 

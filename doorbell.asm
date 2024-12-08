@@ -196,30 +196,12 @@ delay_msec:
 	VSIZE=4 
 FR_TIM3=FMSTR 
 tone:: 
-.if 0
-	_vars VSIZE 
-	ldw (DLY_MS,sp),x   
-	ldw (DIVR,sp),y  ; divisor  
-; FR_TIM3/frequency 
-	ldw y,#FR_TIM3>>16
-    ldw x,#FR_TIM3 
-    ld a,#17
-1$: subw y,(DIVR,sp)
-    ccf 
-    jrc 2$
-    addw y,(DIVR,sp)
-    rcf 
-2$:     
-    rlcw x 
-    rlcw y 
-    dec a 
-    jrne 1$
-.endif 
+	_led_on 
 	ld a,yh 
 	ld TIM3_ARRH,a 
 	ld a,yl 
 	ld TIM3_ARRL,a 
-; 50% duty cycle 
+; 25% duty cycle 
 	srlw y  
 	ld a,yh 
 	ld TIM3_CCR2H,a 
@@ -229,19 +211,23 @@ tone::
 	bset TIM3_CR1,#TIM_CR1_CEN
 	bset TIM3_EGR,#TIM_EGR_UG 	
 ;	ldw x,(DLY_MS,sp)
+	_led_on 
 	_tone_on
-	call delay_msec    
+	subw x,#60 
+	call delay_msec
+	_led_off 
+	ldw x,#60
 tone_off: 
 	_tone_off 
- ;    _drop VSIZE 
+	call delay_msec
 	ret 
 
 score: ; frenquency (ARR value), duration (msec) 
-	.word 2551,250 ; sol4 
-	.word 2273,250 ; la4 
-	.word 2863,250 ; fa4 
-	.word 5727,250 ; fa3 
-	.word 3822,250 ; do4 
+	.word 2551,300 ; sol4 
+	.word 2273,300 ; la4 
+	.word 2863,300 ; fa4 
+	.word 5727,300 ; fa3 
+	.word 3822,300 ; do4 
 	.word 0,0 ; end marker 
 
 ;-----------------------------
@@ -249,7 +235,6 @@ score: ; frenquency (ARR value), duration (msec)
 ;-----------------------------
 
 play_tune:
-	_led_on 
 	ldw x,#score 
 	_strxz ptr 
 1$:
@@ -262,12 +247,9 @@ play_tune:
 	decw x 
 	ldw x,(x)
 	call tone
-	ldw x,#65
-	call delay_msec
 	jra 1$ 
 3$: 
 ; end test code 
-	_led_off
 	ret 
 
 	
@@ -296,11 +278,9 @@ reset:
 	call config_exti
 ; enable interrupts	
 	rim
-	_led_on 
-	ldw y,#1000
+	ldw y,#2000
 	ldw x,#150
 	call tone 
-	_led_off    
 1$:
 	_enable_button
     halt  	
