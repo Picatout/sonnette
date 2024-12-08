@@ -2873,7 +2873,7 @@
 				)
 			)
 		)
-		(property "Value" "10µF/16V"
+		(property "Value" "470µF/16V"
 			(at 231.394 148.844 90)
 			(effects
 				(font
