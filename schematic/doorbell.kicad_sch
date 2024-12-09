@@ -2063,6 +2063,16 @@
 		)
 		(uuid "7e796ad0-3e4c-4863-9ec1-edd5a1ebd6db")
 	)
+	(text "version 1"
+		(exclude_from_sim no)
+		(at 199.644 177.546 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "92391317-f1ee-47f1-bca3-ff87f5b7854c")
+	)
 	(global_label "Vdd"
 		(shape input)
 		(at 191.77 152.4 180)
@@ -3479,6 +3489,44 @@
 				(path "/446a5a63-b234-4c89-aadd-313415f72588"
 					(reference "#PWR03")
 					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 261.62 163.83)
+		(size 34.29 15.24)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "0bc9a6ab-8ada-4f2a-ab23-c15c3da4e8cf")
+		(property "Sheetname" "version_2"
+			(at 261.62 163.1184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "version_2.kicad_sch"
+			(at 261.62 179.6546 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "doorbell"
+				(path "/446a5a63-b234-4c89-aadd-313415f72588"
+					(page "2")
 				)
 			)
 		)

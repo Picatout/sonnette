@@ -20,6 +20,8 @@
 	.include "inc/stm8l001j3.inc" 
 
     FMSTR = 2000000 ; 2Mhz
+
+; sound output 
     BELL_PORT=PD
     BELL_BIT=0
 
@@ -31,6 +33,7 @@
 	bres TIM3_CR1,#TIM_CR1_CEN 
     .endm 
 
+; bell button input 
     BTN_PORT=PC 
     BTN_BIT=1 
 
@@ -44,6 +47,7 @@
     bres BTN_PORT+GPIO_CR2,#BTN_BIT 
     .endm 
 
+; LED port 
     LED_PORT=PB 
     LED_BIT=7
 
@@ -55,7 +59,7 @@
     bset LED_PORT,#LED_BIT 
     .endm 
 
-    .macro _LED_TOGGLE 
+    .macro _led_toggle 
     bcpl LED_PORT,#LED_BIT 
     .endm 
 

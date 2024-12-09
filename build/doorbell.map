@@ -18,10 +18,10 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s_SSEG0                         
      00000000  s__CODE                         
      00000001  s_DATA                          
-     00000007  l_DATA1                         
+     00000009  l_DATA1                         
      00000080  l_HOME                          
      00000080  l_SSEG0                         
-     0000010D  l_CODE                          
+     0000011B  l_CODE                          
      00008000  s_HOME                          
      00008080  s_CODE                          
 
@@ -51,14 +51,15 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-DATA1                               00000000    00000007 =           7. bytes (ABS,CON)
+DATA1                               00000000    00000009 =           9. bytes (ABS,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000001  ticks                              HW_INIT
      00000003  timer                              HW_INIT
-     00000005  flags                              HW_INIT
-     00000006  ptr                                HW_INIT
+     00000005  duration                           HW_INIT
+     00000007  flags                              HW_INIT
+     00000008  ptr                                HW_INIT
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
 Hexadecimal  [32-Bits]
@@ -76,7 +77,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                00008080    0000010D =         269. bytes (REL,CON)
+CODE                                00008080    0000011B =         283. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------

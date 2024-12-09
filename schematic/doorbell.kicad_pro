@@ -239,7 +239,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "flood-detector.kicad_pro",
+    "filename": "doorbell.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -386,6 +386,10 @@
     [
       "446a5a63-b234-4c89-aadd-313415f72588",
       "Racine"
+    ],
+    [
+      "0bc9a6ab-8ada-4f2a-ab23-c15c3da4e8cf",
+      "version_2"
     ]
   ],
   "text_variables": {}

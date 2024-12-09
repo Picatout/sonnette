@@ -76,6 +76,7 @@ stack_unf:: ; stack underflow ; control_stack bottom
 ; keep the following 3 variables in this order 
 ticks:: .blkw 1 ; milliseconds ticks counter (see Timer4UpdateHandler)
 timer:: .blkw 1 ;  milliseconds count down timer 
+duration:: .blkw 1 ; tone duration 
 flags:: .blkb 1 ; various boolean flags
 ptr:: .blkw 1 ; score pointer 
 
@@ -196,7 +197,7 @@ delay_msec:
 	VSIZE=4 
 FR_TIM3=FMSTR 
 tone:: 
-	_led_on 
+	_strxz duration 
 	ld a,yh 
 	ld TIM3_ARRH,a 
 	ld a,yl 
@@ -210,24 +211,30 @@ tone::
 	bset TIM3_CCER1,#TIM_CCER1_CC2E
 	bset TIM3_CR1,#TIM_CR1_CEN
 	bset TIM3_EGR,#TIM_EGR_UG 	
-;	ldw x,(DLY_MS,sp)
-	_led_on 
 	_tone_on
-	subw x,#60 
+;tremolo loop 
+tremolo:
+	_led_toggle 
+	ldw x,#30
 	call delay_msec
-	_led_off 
-	ldw x,#60
+	_ldxz duration
+	subw x,#30
+	_strxz duration 
+	cpw x,#60 
+	jrpl  tremolo 
 tone_off: 
-	_tone_off 
+	_tone_off
+	_led_off  
+	ldw x,#60 
 	call delay_msec
 	ret 
 
 score: ; frenquency (ARR value), duration (msec) 
-	.word 2551,300 ; sol4 
-	.word 2273,300 ; la4 
-	.word 2863,300 ; fa4 
-	.word 5727,300 ; fa3 
-	.word 3822,300 ; do4 
+	.word 2551,500 ; sol4 
+	.word 2273,500 ; la4 
+	.word 2863,500 ; fa4 
+	.word 5727,500 ; fa3 
+	.word 3822,500 ; do4 
 	.word 0,0 ; end marker 
 
 ;-----------------------------
@@ -269,6 +276,7 @@ reset:
     bset BELL_PORT+GPIO_CR1,#BELL_BIT ; push pull 
 ; set LED port as output open drain 
 	bset LED_PORT+GPIO_DDR,#LED_BIT
+    bset LED_PORT+GPIO_CR1,#LED_BIT ; push pull 
 	_led_off 
 ; init TIMER4 to interrupt at every millisecond
 	call timer4_init
