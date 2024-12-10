@@ -212,6 +212,7 @@ tone::
 	bset TIM3_CR1,#TIM_CR1_CEN
 	bset TIM3_EGR,#TIM_EGR_UG 	
 	_tone_on
+.if TREMOLO
 ;tremolo loop 
 tremolo:
 	_led_toggle 
@@ -222,6 +223,11 @@ tremolo:
 	_strxz duration 
 	cpw x,#60 
 	jrpl  tremolo 
+.else 
+	_led_on
+	subw x,#60 
+	call delay_msec 
+.endif 
 tone_off: 
 	_tone_off
 	_led_off  

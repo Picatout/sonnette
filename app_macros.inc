@@ -21,6 +21,7 @@
 
     FMSTR = 2000000 ; 2Mhz
 
+TREMOLO=0
 ; sound output 
     BELL_PORT=PD
     BELL_BIT=0

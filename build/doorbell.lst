@@ -766,55 +766,56 @@ Hexadecimal [24-Bits]
                                      21 
                            1E8480    22     FMSTR = 2000000 ; 2Mhz
                                      23 
-                                     24 ; sound output 
-                           00500F    25     BELL_PORT=PD
-                           000000    26     BELL_BIT=0
-                                     27 
-                                     28     .macro _tone_on
-                                     29     bset TIM3_CR1,#TIM_CR1_CEN 
-                                     30     .endm
-                                     31 
-                                     32     .macro _tone_off 
-                                     33 	bres TIM3_CR1,#TIM_CR1_CEN 
-                                     34     .endm 
-                                     35 
-                                     36 ; bell button input 
-                           00500A    37     BTN_PORT=PC 
-                           000001    38     BTN_BIT=1 
-                                     39 
-                                     40     ; enable exti on ring button 
-                                     41     .macro _enable_button
-                                     42     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
-                                     43     .endm 
-                                     44 
-                                     45     ; disable exti on ring button 
-                                     46     .macro _disable_button
-                                     47     bres BTN_PORT+GPIO_CR2,#BTN_BIT 
-                                     48     .endm 
-                                     49 
-                                     50 ; LED port 
-                           005005    51     LED_PORT=PB 
-                           000007    52     LED_BIT=7
-                                     53 
-                                     54     .macro _led_on 
-                                     55     bres LED_PORT,#LED_BIT 
-                                     56     .endm 
-                                     57 
-                                     58     .macro _led_off 
-                                     59     bset LED_PORT,#LED_BIT 
-                                     60     .endm 
-                                     61 
-                                     62     .macro _led_toggle 
-                                     63     bcpl LED_PORT,#LED_BIT 
-                                     64     .endm 
-                                     65 
+                           000000    24 TREMOLO=0
+                                     25 ; sound output 
+                           00500F    26     BELL_PORT=PD
+                           000000    27     BELL_BIT=0
+                                     28 
+                                     29     .macro _tone_on
+                                     30     bset TIM3_CR1,#TIM_CR1_CEN 
+                                     31     .endm
+                                     32 
+                                     33     .macro _tone_off 
+                                     34 	bres TIM3_CR1,#TIM_CR1_CEN 
+                                     35     .endm 
+                                     36 
+                                     37 ; bell button input 
+                           00500A    38     BTN_PORT=PC 
+                           000001    39     BTN_BIT=1 
+                                     40 
+                                     41     ; enable exti on ring button 
+                                     42     .macro _enable_button
+                                     43     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
+                                     44     .endm 
+                                     45 
+                                     46     ; disable exti on ring button 
+                                     47     .macro _disable_button
+                                     48     bres BTN_PORT+GPIO_CR2,#BTN_BIT 
+                                     49     .endm 
+                                     50 
+                                     51 ; LED port 
+                           005005    52     LED_PORT=PB 
+                           000007    53     LED_BIT=7
+                                     54 
+                                     55     .macro _led_on 
+                                     56     bres LED_PORT,#LED_BIT 
+                                     57     .endm 
+                                     58 
+                                     59     .macro _led_off 
+                                     60     bset LED_PORT,#LED_BIT 
+                                     61     .endm 
+                                     62 
+                                     63     .macro _led_toggle 
+                                     64     bcpl LED_PORT,#LED_BIT 
+                                     65     .endm 
                                      66 
+                                     67 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 16.
 Hexadecimal [24-Bits]
 
 
 
-                                     67 	.include "inc/gen_macros.inc"
+                                     68 	.include "inc/gen_macros.inc"
                                       1 ;;
                                       2 ; Copyright Jacques Deschênes 2019 
                                       3 ; This file is part of STM8_NUCLEO 
@@ -940,46 +941,46 @@ Hexadecimal [24-Bits]
 
 
 
-                                     68 
-                           000080    69     STACK_SIZE=128
-                           0005FF    70     STACK_EMPTY=RAM_SIZE-1 
-                                     71 
-                                     72 ; boolean flags 
-                           000007    73     FTIMER=7 
-                                     74 
-                                     75 ;--------------------------------------
-                                     76 ;   assembler flags 
-                                     77 ;-------------------------------------
-                                     78 
-                                     79     ; assume 16 Mhz Fcpu 
-                                     80      .macro _usec_dly n 
-                                     81     ldw x,#(16*n-2)/4 ; 2 cy 
-                                     82     decw x  ; 1 cy 
-                                     83     nop     ; 1 cy 
-                                     84     jrne .-2 ; 2 cy 
-                                     85     .endm 
-                                     86 
-                                     87 ;----------------------------------
-                                     88 ; functions arguments access 
-                                     89 ; from stack 
-                                     90 ; caller push arguments before call
-                                     91 ; and drop them after call  
-                                     92 ;----------------------------------    
-                                     93     ; get argument in X 
-                                     94     .macro _get_arg n 
-                                     95     ldw x,(2*(n+1),sp)
-                                     96     .endm 
-                                     97 
-                                     98     ; store X in argument n 
-                                     99     .macro _store_arg n 
-                                    100     ldw (2*(n+1),sp),x 
-                                    101     .endm 
-                                    102 
-                                    103     ; drop function arguments 
-                                    104     .macro _drop_args n 
-                                    105     addw sp,#2*n
-                                    106     .endm 
-                                    107 
+                                     69 
+                           000080    70     STACK_SIZE=128
+                           0005FF    71     STACK_EMPTY=RAM_SIZE-1 
+                                     72 
+                                     73 ; boolean flags 
+                           000007    74     FTIMER=7 
+                                     75 
+                                     76 ;--------------------------------------
+                                     77 ;   assembler flags 
+                                     78 ;-------------------------------------
+                                     79 
+                                     80     ; assume 16 Mhz Fcpu 
+                                     81      .macro _usec_dly n 
+                                     82     ldw x,#(16*n-2)/4 ; 2 cy 
+                                     83     decw x  ; 1 cy 
+                                     84     nop     ; 1 cy 
+                                     85     jrne .-2 ; 2 cy 
+                                     86     .endm 
+                                     87 
+                                     88 ;----------------------------------
+                                     89 ; functions arguments access 
+                                     90 ; from stack 
+                                     91 ; caller push arguments before call
+                                     92 ; and drop them after call  
+                                     93 ;----------------------------------    
+                                     94     ; get argument in X 
+                                     95     .macro _get_arg n 
+                                     96     ldw x,(2*(n+1),sp)
+                                     97     .endm 
+                                     98 
+                                     99     ; store X in argument n 
+                                    100     .macro _store_arg n 
+                                    101     ldw (2*(n+1),sp),x 
+                                    102     .endm 
+                                    103 
+                                    104     ; drop function arguments 
+                                    105     .macro _drop_args n 
+                                    106     addw sp,#2*n
+                                    107     .endm 
+                                    108 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 20.
 Hexadecimal [24-Bits]
 
@@ -1000,7 +1001,7 @@ Hexadecimal [24-Bits]
                                      38 ;; interrupt vector table at 0x8000
                                      39 ;;--------------------------------------
                                      40 
-      000000 82 00 00 E1             41     int reset   			; RESET vector 
+      000000 82 00 00 D5             41     int reset   			; RESET vector 
       000004 82 00 00 00             42 	int NonHandledInterrupt ; TRAP instruction 
       000008 00 00 00 00             43 	.word 0,0               ; not used  
       00000C 82 00 00 00             44 	int NonHandledInterrupt ; int1 FLASH   
@@ -1199,110 +1200,114 @@ Hexadecimal [24-Bits]
       000082 72 10 52 87      [ 1]  213 	bset TIM3_EGR,#TIM_EGR_UG 	
       000086                        214 	_tone_on
       000086 72 10 52 80      [ 1]    1     bset TIM3_CR1,#TIM_CR1_CEN 
-                                    215 ;tremolo loop 
-      00008A                        216 tremolo:
-      00008A                        217 	_led_toggle 
-      00008A 90 1E 50 05      [ 1]    1     bcpl LED_PORT,#LED_BIT 
-      00008E AE 00 1E         [ 2]  218 	ldw x,#30
-      000091 CD 00 56         [ 4]  219 	call delay_msec
-      000094                        220 	_ldxz duration
-      000094 BE 05                    1     .byte 0xbe,duration 
-      000096 1D 00 1E         [ 2]  221 	subw x,#30
-      000099                        222 	_strxz duration 
-      000099 BF 05                    1     .byte 0xbf,duration 
-      00009B A3 00 3C         [ 2]  223 	cpw x,#60 
-      00009E 2A EA            [ 1]  224 	jrpl  tremolo 
-      0000A0                        225 tone_off: 
-      0000A0                        226 	_tone_off
-      0000A0 72 11 52 80      [ 1]    1 	bres TIM3_CR1,#TIM_CR1_CEN 
-      0000A4                        227 	_led_off  
-      0000A4 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
-      0000A8 AE 00 3C         [ 2]  228 	ldw x,#60 
-      0000AB CD 00 56         [ 4]  229 	call delay_msec
-      0000AE 81               [ 4]  230 	ret 
+                           000000   215 .if TREMOLO
+                                    216 ;tremolo loop 
+                                    217 tremolo:
+                                    218 	_led_toggle 
+                                    219 	ldw x,#30
+                                    220 	call delay_msec
+                                    221 	_ldxz duration
+                                    222 	subw x,#30
+                                    223 	_strxz duration 
+                                    224 	cpw x,#60 
+                                    225 	jrpl  tremolo 
+                           000001   226 .else 
+      00008A                        227 	_led_on
+      00008A 72 1F 50 05      [ 1]    1     bres LED_PORT,#LED_BIT 
+      00008E 1D 00 3C         [ 2]  228 	subw x,#60 
+      000091 CD 00 56         [ 4]  229 	call delay_msec 
+                                    230 .endif 
+      000094                        231 tone_off: 
+      000094                        232 	_tone_off
+      000094 72 11 52 80      [ 1]    1 	bres TIM3_CR1,#TIM_CR1_CEN 
+      000098                        233 	_led_off  
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 24.
 Hexadecimal [24-Bits]
 
 
 
-                                    231 
-      0000AF                        232 score: ; frenquency (ARR value), duration (msec) 
-      0000AF 09 F7 01 F4            233 	.word 2551,500 ; sol4 
-      0000B3 08 E1 01 F4            234 	.word 2273,500 ; la4 
-      0000B7 0B 2F 01 F4            235 	.word 2863,500 ; fa4 
-      0000BB 16 5F 01 F4            236 	.word 5727,500 ; fa3 
-      0000BF 0E EE 01 F4            237 	.word 3822,500 ; do4 
-      0000C3 00 00 00 00            238 	.word 0,0 ; end marker 
-                                    239 
-                                    240 ;-----------------------------
-                                    241 ; doorbell play a short tune 
-                                    242 ;-----------------------------
-                                    243 
-      0000C7                        244 play_tune:
-      0000C7 AE 00 AF         [ 2]  245 	ldw x,#score 
-      0000CA                        246 	_strxz ptr 
+      000098 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
+      00009C AE 00 3C         [ 2]  234 	ldw x,#60 
+      00009F CD 00 56         [ 4]  235 	call delay_msec
+      0000A2 81               [ 4]  236 	ret 
+                                    237 
+      0000A3                        238 score: ; frenquency (ARR value), duration (msec) 
+      0000A3 09 F7 01 F4            239 	.word 2551,500 ; sol4 
+      0000A7 08 E1 01 F4            240 	.word 2273,500 ; la4 
+      0000AB 0B 2F 01 F4            241 	.word 2863,500 ; fa4 
+      0000AF 16 5F 01 F4            242 	.word 5727,500 ; fa3 
+      0000B3 0E EE 01 F4            243 	.word 3822,500 ; do4 
+      0000B7 00 00 00 00            244 	.word 0,0 ; end marker 
+                                    245 
+                                    246 ;-----------------------------
+                                    247 ; doorbell play a short tune 
+                                    248 ;-----------------------------
+                                    249 
+      0000BB                        250 play_tune:
+      0000BB AE 00 A3         [ 2]  251 	ldw x,#score 
+      0000BE                        252 	_strxz ptr 
+      0000BE BF 08                    1     .byte 0xbf,ptr 
+      0000C0                        253 1$:
+      0000C0 91 CE 08         [ 5]  254 	ldw y,[ptr]
+      0000C3 27 0F            [ 1]  255 	jreq 3$
+      0000C5                        256 	_ldxz ptr 
+      0000C5 BE 08                    1     .byte 0xbe,ptr 
+      0000C7 1C 00 04         [ 2]  257 	addw x,#4
+      0000CA                        258 	_strxz ptr 
       0000CA BF 08                    1     .byte 0xbf,ptr 
-      0000CC                        247 1$:
-      0000CC 91 CE 08         [ 5]  248 	ldw y,[ptr]
-      0000CF 27 0F            [ 1]  249 	jreq 3$
-      0000D1                        250 	_ldxz ptr 
-      0000D1 BE 08                    1     .byte 0xbe,ptr 
-      0000D3 1C 00 04         [ 2]  251 	addw x,#4
-      0000D6                        252 	_strxz ptr 
-      0000D6 BF 08                    1     .byte 0xbf,ptr 
-      0000D8 5A               [ 2]  253 	decw x 
-      0000D9 5A               [ 2]  254 	decw x 
-      0000DA FE               [ 2]  255 	ldw x,(x)
-      0000DB CD 00 62         [ 4]  256 	call tone
-      0000DE 20 EC            [ 2]  257 	jra 1$ 
-      0000E0                        258 3$: 
-                                    259 ; end test code 
-      0000E0 81               [ 4]  260 	ret 
-                                    261 
-                                    262 	
-                                    263 ;-------------------------------------
-                                    264 ;  initialization entry point 
-                                    265 ;-------------------------------------
-      0000E1                        266 reset:
-                                    267 ;set stack 
-      0000E1 AE 05 FF         [ 2]  268 	ldw x,#STACK_EMPTY
-      0000E4 94               [ 1]  269 	ldw sp,x
-                                    270 ; clear all ram 
-      0000E5 7F               [ 1]  271 0$: clr (x)
-      0000E6 5A               [ 2]  272 	decw x 
-      0000E7 26 FC            [ 1]  273 	jrne 0$
-                                    274 ; set user BELL sound pin as output 
-      0000E9 72 10 50 11      [ 1]  275     bset BELL_PORT+GPIO_DDR,#BELL_BIT ; output
-      0000ED 72 10 50 12      [ 1]  276     bset BELL_PORT+GPIO_CR1,#BELL_BIT ; push pull 
-                                    277 ; set LED port as output open drain 
-      0000F1 72 1E 50 07      [ 1]  278 	bset LED_PORT+GPIO_DDR,#LED_BIT
-      0000F5 72 1E 50 08      [ 1]  279     bset LED_PORT+GPIO_CR1,#LED_BIT ; push pull 
-      0000F9                        280 	_led_off 
-      0000F9 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
-                                    281 ; init TIMER4 to interrupt at every millisecond
+      0000CC 5A               [ 2]  259 	decw x 
+      0000CD 5A               [ 2]  260 	decw x 
+      0000CE FE               [ 2]  261 	ldw x,(x)
+      0000CF CD 00 62         [ 4]  262 	call tone
+      0000D2 20 EC            [ 2]  263 	jra 1$ 
+      0000D4                        264 3$: 
+                                    265 ; end test code 
+      0000D4 81               [ 4]  266 	ret 
+                                    267 
+                                    268 	
+                                    269 ;-------------------------------------
+                                    270 ;  initialization entry point 
+                                    271 ;-------------------------------------
+      0000D5                        272 reset:
+                                    273 ;set stack 
+      0000D5 AE 05 FF         [ 2]  274 	ldw x,#STACK_EMPTY
+      0000D8 94               [ 1]  275 	ldw sp,x
+                                    276 ; clear all ram 
+      0000D9 7F               [ 1]  277 0$: clr (x)
+      0000DA 5A               [ 2]  278 	decw x 
+      0000DB 26 FC            [ 1]  279 	jrne 0$
+                                    280 ; set user BELL sound pin as output 
+      0000DD 72 10 50 11      [ 1]  281     bset BELL_PORT+GPIO_DDR,#BELL_BIT ; output
+      0000E1 72 10 50 12      [ 1]  282     bset BELL_PORT+GPIO_CR1,#BELL_BIT ; push pull 
+                                    283 ; set LED port as output open drain 
+      0000E5 72 1E 50 07      [ 1]  284 	bset LED_PORT+GPIO_DDR,#LED_BIT
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 25.
 Hexadecimal [24-Bits]
 
 
 
-      0000FD CD 00 27         [ 4]  282 	call timer4_init
-                                    283 ; init TIMER3, for sound generation 
-      000100 CD 00 40         [ 4]  284 	call timer3_init
-                                    285 ; configure EXTI on button 
-      000103 CD 00 51         [ 4]  286 	call config_exti
-                                    287 ; enable interrupts	
-      000106 9A               [ 1]  288 	rim
-      000107 90 AE 07 D0      [ 2]  289 	ldw y,#2000
-      00010B AE 00 96         [ 2]  290 	ldw x,#150
-      00010E CD 00 62         [ 4]  291 	call tone 
-      000111                        292 1$:
-      000111                        293 	_enable_button
-      000111 72 12 50 0E      [ 1]    1     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
-      000115 8E               [10]  294     halt  	
-      000116 CD 00 C7         [ 4]  295 	call play_tune 
-      000119 20 F6            [ 2]  296 	jra 1$ 
-                                    297  
-                                    298  
+      0000E9 72 1E 50 08      [ 1]  285     bset LED_PORT+GPIO_CR1,#LED_BIT ; push pull 
+      0000ED                        286 	_led_off 
+      0000ED 72 1E 50 05      [ 1]    1     bset LED_PORT,#LED_BIT 
+                                    287 ; init TIMER4 to interrupt at every millisecond
+      0000F1 CD 00 27         [ 4]  288 	call timer4_init
+                                    289 ; init TIMER3, for sound generation 
+      0000F4 CD 00 40         [ 4]  290 	call timer3_init
+                                    291 ; configure EXTI on button 
+      0000F7 CD 00 51         [ 4]  292 	call config_exti
+                                    293 ; enable interrupts	
+      0000FA 9A               [ 1]  294 	rim
+      0000FB 90 AE 07 D0      [ 2]  295 	ldw y,#2000
+      0000FF AE 00 96         [ 2]  296 	ldw x,#150
+      000102 CD 00 62         [ 4]  297 	call tone 
+      000105                        298 1$:
+      000105                        299 	_enable_button
+      000105 72 12 50 0E      [ 1]    1     bset BTN_PORT+GPIO_CR2,#BTN_BIT 
+      000109 8E               [10]  300     halt  	
+      00010A CD 00 BB         [ 4]  301 	call play_tune 
+      00010D 20 F6            [ 2]  302 	jra 1$ 
+                                    303  
+                                    304  
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 26.
 Hexadecimal [24-Bits]
 
@@ -1464,35 +1469,35 @@ Symbol Table
     TIM_PSCR=  000000     |     TIM_SMCR=  000007     |     TIM_SMCR=  000000 
     TIM_SMCR=  000004     |     TIM_SR1_=  000007     |     TIM_SR1_=  000001 
     TIM_SR1_=  000002     |     TIM_SR1_=  000006     |     TIM_SR1_=  000000 
-    TIM_SR2_=  000001     |     TIM_SR2_=  000002     |   7 Timer4Up   00000A R
-    UBC     =  004802     |     USART_BR=  005232     |     USART_BR=  005233 
-    USART_CR=  005234     |     USART_CR=  000004     |     USART_CR=  000002 
-    USART_CR=  000000     |     USART_CR=  000001     |     USART_CR=  000007 
-    USART_CR=  000006     |     USART_CR=  000005     |     USART_CR=  000003 
-    USART_CR=  005235     |     USART_CR=  000004     |     USART_CR=  000002 
-    USART_CR=  000005     |     USART_CR=  000001     |     USART_CR=  000000 
-    USART_CR=  000006     |     USART_CR=  000003     |     USART_CR=  000007 
-    USART_CR=  005236     |     USART_CR=  000003     |     USART_CR=  000001 
-    USART_CR=  000002     |     USART_CR=  000000     |     USART_CR=  000006 
-    USART_CR=  000004     |     USART_CR=  000005     |     USART_CR=  005237 
-    USART_CR=  000000     |     USART_CR=  000001     |     USART_CR=  000002 
-    USART_CR=  000003     |     USART_CR=  000004     |     USART_CR=  000006 
-    USART_CR=  000005     |     USART_DR=  005231     |     USART_SR=  005230 
-    USART_SR=  000001     |     USART_SR=  000004     |     USART_SR=  000002 
-    USART_SR=  000003     |     USART_SR=  000000     |     USART_SR=  000005 
-    USART_SR=  000006     |     USART_SR=  000007     |     VSIZE   =  000004 
-    WFE_CR1 =  0050A6     |     WFE_CR2 =  0050A7     |   7 clock_in   000026 R
-  7 config_e   000051 R   |   7 delay_ms   000056 R   |   5 duration   000005 GR
+    TIM_SR2_=  000001     |     TIM_SR2_=  000002     |     TREMOLO =  000000 
+  7 Timer4Up   00000A R   |     UBC     =  004802     |     USART_BR=  005232 
+    USART_BR=  005233     |     USART_CR=  005234     |     USART_CR=  000004 
+    USART_CR=  000002     |     USART_CR=  000000     |     USART_CR=  000001 
+    USART_CR=  000007     |     USART_CR=  000006     |     USART_CR=  000005 
+    USART_CR=  000003     |     USART_CR=  005235     |     USART_CR=  000004 
+    USART_CR=  000002     |     USART_CR=  000005     |     USART_CR=  000001 
+    USART_CR=  000000     |     USART_CR=  000006     |     USART_CR=  000003 
+    USART_CR=  000007     |     USART_CR=  005236     |     USART_CR=  000003 
+    USART_CR=  000001     |     USART_CR=  000002     |     USART_CR=  000000 
+    USART_CR=  000006     |     USART_CR=  000004     |     USART_CR=  000005 
+    USART_CR=  005237     |     USART_CR=  000000     |     USART_CR=  000001 
+    USART_CR=  000002     |     USART_CR=  000003     |     USART_CR=  000004 
+    USART_CR=  000006     |     USART_CR=  000005     |     USART_DR=  005231 
+    USART_SR=  005230     |     USART_SR=  000001     |     USART_SR=  000004 
+    USART_SR=  000002     |     USART_SR=  000003     |     USART_SR=  000000 
+    USART_SR=  000005     |     USART_SR=  000006     |     USART_SR=  000007 
+    VSIZE   =  000004     |     WFE_CR1 =  0050A6     |     WFE_CR2 =  0050A7 
+  7 clock_in   000026 R   |   7 config_e   000051 R   |   7 delay_ms   000056 R
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 29.
 Hexadecimal [24-Bits]
 
 Symbol Table
 
-  5 flags      000007 GR  |   6 free_ram   000100 GR  |   7 play_tun   0000C7 R
-  5 ptr        000008 GR  |   7 reset      0000E1 R   |   7 score      0000AF R
-  2 stack_fu   00057F GR  |   2 stack_un   0005FF GR  |   5 ticks      000001 GR
-  5 timer      000003 GR  |   7 timer3_i   000040 R   |   7 timer4_i   000027 R
-  7 tone       000062 GR  |   7 tone_off   0000A0 R   |   7 tremolo    00008A R
+  5 duration   000005 GR  |   5 flags      000007 GR  |   6 free_ram   000100 GR
+  7 play_tun   0000BB R   |   5 ptr        000008 GR  |   7 reset      0000D5 R
+  7 score      0000A3 R   |   2 stack_fu   00057F GR  |   2 stack_un   0005FF GR
+  5 ticks      000001 GR  |   5 timer      000003 GR  |   7 timer3_i   000040 R
+  7 timer4_i   000027 R   |   7 tone       000062 GR  |   7 tone_off   000094 R
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 30.
 Hexadecimal [24-Bits]
@@ -1506,5 +1511,5 @@ Area Table
    4 DATA       size      0   flags    8
    5 DATA1      size      9   flags    8
    6 DATA2      size      0   flags    8
-   7 CODE       size    11B   flags    0
+   7 CODE       size    10F   flags    0
 
